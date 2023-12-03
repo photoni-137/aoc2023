@@ -16,4 +16,7 @@ const sumCalibrationValues = async () => {
   return sumOver(calibrationValues);
 };
 
-console.log(await sumCalibrationValues());
+console.log(
+  "1: Sum of naive calibration values:",
+  await sumCalibrationValues(),
+);
