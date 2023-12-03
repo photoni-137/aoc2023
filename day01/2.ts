@@ -1,9 +1,18 @@
 import { sumOver } from "../lib/math.ts";
 import { getNonEmptyLines } from "../lib/parsing.ts";
-import { first, last } from "../lib/arrays.ts";
-import { regexUnion } from "../lib/regex.ts";
+import { dropUndefinedValues, first, last } from "../lib/arrays.ts";
 
 const digitWords = {
+  "0": 0,
+  "1": 1,
+  "2": 2,
+  "3": 3,
+  "4": 4,
+  "5": 5,
+  "6": 6,
+  "7": 7,
+  "8": 8,
+  "9": 9,
   "zero": 0,
   "one": 1,
   "two": 2,
@@ -16,61 +25,40 @@ const digitWords = {
   "nine": 9,
 } satisfies Record<string, number>;
 
-const isDigitWord = (s: string): s is DigitWord =>
-  Object.keys(digitWords).includes(s);
-
 type DigitWord = keyof typeof digitWords;
 
-const digitRegex = regexUnion(...(Object.keys(digitWords)), "\\d");
+const digitPatterns = Object.keys(digitWords) as DigitWord[];
 
-const toNumber = (s: string) => isDigitWord(s) ? digitWords[s] : Number(s);
+const toNumber = (s: DigitWord) => digitWords[s];
+
+const substrings = (s: string) => {
+  const substrings: string[] = [];
+  for (let i = 0; i < s.length; i++) {
+    substrings[i] = s.slice(i);
+  }
+  return substrings;
+};
+
+const startingDigit = (s: string): number | undefined => {
+  const pattern = digitPatterns.find((pattern) => s.startsWith(pattern));
+  return pattern ? toNumber(pattern) : undefined;
+};
 
 const getDigits = (s: string) => {
-  const matches = s.match(digitRegex);
-  if (!matches) {
-    throw new Error(`found no digits in "${s}"`);
-  }
-  if (s.match(/twone/)) {
-    console.log(matches);
-  }
-  return matches.map((match) => toNumber(match));
+  const digits = substrings(s).map((substring) => startingDigit(substring));
+  return dropUndefinedValues(digits);
 };
 
 const getCalibrationValue = (line: string) => {
   const digits = getDigits(line);
-  const value = 10 * first(digits) + last(digits);
-  if (value < 11 || value > 99 || line.match(/twone/)) {
-    console.log(line, value);
-  }
-  return value;
+  return 10 * first(digits) + last(digits);
 };
 
 const sumCalibrationValues = async () => {
   const lines = await getNonEmptyLines("input.txt");
   const calibrationValues = lines.map((line) => getCalibrationValue(line));
-  // for (let i = 0; i < 1000; i++) {
-  //   console.log(lines[i], calibrationValues[i]);
-  // }
   return sumOver(calibrationValues);
 };
-
-// let sum = 0;
-// [
-//   "two1nine",
-//   "eightwothree",
-//   "abcone2threexyz",
-//   "xtwone3four",
-//   "4nineeightseven2",
-//   "zoneight234",
-//   "7pqrstsixteen",
-// ].forEach((line) => {
-//   console.log(
-//     line,
-//     getCalibrationValue(line),
-//   );
-//   sum += getCalibrationValue(line);
-// });
-// console.log(sum);
 
 console.log(
   "2: Sum of actual calibration values:",
