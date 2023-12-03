@@ -12,7 +12,7 @@ const getCalibrationValue = (line: string) => {
 
 const sumCalibrationValues = async () => {
   const lines = await getNonEmptyLines("input.txt");
-  const calibrationValues = lines.map((line) => getCalibrationValue(line));
+  const calibrationValues = lines.map(getCalibrationValue);
   return sumOver(calibrationValues);
 };
 

@@ -40,12 +40,12 @@ const substrings = (s: string) => {
 };
 
 const startingDigit = (s: string): number | undefined => {
-  const pattern = digitPatterns.find((pattern) => s.startsWith(pattern));
+  const pattern = digitPatterns.find(s.startsWith);
   return pattern ? toNumber(pattern) : undefined;
 };
 
 const getDigits = (s: string) => {
-  const digits = substrings(s).map((substring) => startingDigit(substring));
+  const digits = substrings(s).map(startingDigit);
   return dropUndefinedValues(digits);
 };
 
@@ -56,7 +56,7 @@ const getCalibrationValue = (line: string) => {
 
 const sumCalibrationValues = async () => {
   const lines = await getNonEmptyLines("input.txt");
-  const calibrationValues = lines.map((line) => getCalibrationValue(line));
+  const calibrationValues = lines.map(getCalibrationValue);
   return sumOver(calibrationValues);
 };
 
