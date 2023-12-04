@@ -7,11 +7,13 @@ export enum Color {
   Blue = "blue",
 }
 
-export type Set = Record<Color, number>;
+export const colors = Object.values(Color) as Color[];
+
+export type DiceSet = Record<Color, number>;
 
 export type Game = {
   id: number;
-  sets: Set[];
+  sets: DiceSet[];
 };
 
 const gameRegex = /^Game (?<id>\d+): (?<sets>.*)$/;
@@ -29,13 +31,13 @@ const parseCount = (color: Color) => (setString: string): number => {
   return groups ? Number(groups.count) : 0;
 };
 
-const parseSet = (setString: string): Set =>
-  Object.values(Color).reduce(
+const parseSet = (setString: string): DiceSet =>
+  colors.reduce(
     (set, color) => ({
       ...set,
       [color]: parseCount(color)(setString),
     }),
-    {} as Set,
+    {} as DiceSet,
   );
 
 const parseSets = (setsString: string) => setsString.split(";").map(parseSet);
@@ -51,14 +53,16 @@ export const parseGame = (line: string): Game => {
   };
 };
 
-const isValidSet = (set: Set) =>
+const isValidSet = (set: DiceSet) =>
   Object.entries(set).every(([color, number]) =>
     number <= maxNumber[color as Color]
   );
 
 const isValidGame = (game: Game) => game.sets.every(isValidSet);
 
-const lines = await getNonEmptyLines("input.txt");
-const games = lines.map(parseGame);
+export const parseGames = async () =>
+  (await getNonEmptyLines("input.txt")).map(parseGame);
+
+const games = await parseGames();
 const validGameIds = games.filter(isValidGame).map((game) => game.id);
 console.log(sumOver(validGameIds));
