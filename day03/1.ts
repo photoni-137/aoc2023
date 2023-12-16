@@ -1,8 +1,4 @@
-import { sumOver } from "../lib/math.ts";
-import { findPartNumbers } from "./lib.ts";
+import { partNumberSum } from "./parseBySymbol.ts";
 
-const partNumbers = await findPartNumbers("input.txt");
-
-console.log(
-  sumOver(partNumbers.map((number) => number.value)),
-);
+const sum = await partNumberSum("input.txt");
+console.log("Part number sum:", sum);

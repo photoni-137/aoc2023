@@ -6,3 +6,8 @@ export const getNonEmptyLines = async (filename: string) => {
   const lines = content.split("\n");
   return lines.filter((line) => line.length > 0);
 };
+
+export const getCharArray = async (filename: string) => {
+  const lines = await getNonEmptyLines(filename);
+  return lines.map((line) => line.split(""));
+};
