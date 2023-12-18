@@ -132,3 +132,21 @@ export const partNumberSum = async (filename: string) => {
   const partNumbers = findPartNumbers(symbols);
   return sumOver(partNumbers.map((partNumber) => partNumber.value));
 };
+
+const isGear = (symbol: Symbol) =>
+  symbol.value === "*" && symbol.numberNeighbors.length === 2;
+
+const gearRatio = (gear: Symbol) => {
+  if (!isGear(gear)) {
+    throw new Error(`not a gear: ${JSON.stringify(gear)}`);
+  }
+  const [n1, n2] = gear.numberNeighbors;
+  return n1.value * n2.value;
+};
+
+export const gearRatioSum = async (filename: string) => {
+  const chars = await getCharArray(filename);
+  const symbols = parseSymbols(chars);
+  const gears = symbols.filter(isGear);
+  return sumOver(gears.map(gearRatio));
+};
